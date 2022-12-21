@@ -6,6 +6,7 @@ const cors = require('cors')
 const Res = require('./models/res')
 const app = express()
 const path = require('path')
+const fs = require('fs')
 const multer = require('multer')
 app.use(express.json())
 app.use(cors())
@@ -31,7 +32,15 @@ app.get('/api/res/:id', (request, response) => {
   Res.findById(id)
     .then(result => {
       if(result){
-        response.json(result)
+        // Convert the image to a base64-encoded string
+        const imageData = result.image.data.toString('base64')
+        
+
+        // Modify the object to include the base64-encoded string
+        const modifiedDoc = { ...result, imageData}
+        console.log(modifiedDoc)
+        // Return the modified object as a response
+        response.json(modifiedDoc)
       }
       else{
         response.status(404).end()
@@ -50,22 +59,21 @@ const Storage = multer.diskStorage({
     cb(null, './public/images')
   },
   filename: function(req, file, cb) {
-    cb(null, Date.now() + path.name(file.originalname))
+    cb(null, Date.now() + path.extname(file.originalname))
   }
 })
 const upload = multer({storage: Storage})
 
-app.post('/api/res', upload.single('testImage'), (req, res) => {
+app.post('/api/res', upload.single('image'), (req, res) => { //first uploaded to folder in server, then adds the image to mongo
   
   const body = req.body //this gets the object
-    
   const newRes = new Res({
     name: body.name,
     rating: body.rating,
     timesVisited: body.timesVisited,
     comments: body.comments,
     image:{
-      data: req.file.filename,
+      data: fs.readFileSync('./public/images/' + req.file.filename),
       contentType:'image/png'
     }
   })

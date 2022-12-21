@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { Buffer } = require('buffer')
 require('dotenv').config()
 // eslint-disable-next-line no-undef
 const url = process.env.MONGODB_URI
