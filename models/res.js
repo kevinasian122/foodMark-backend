@@ -14,6 +14,33 @@ mongoose.connect(url, { useNewUrlParser: true })
   })
 
 const resSchema = new mongoose.Schema({ //mongoose schema
+  mapsRating: {
+    type: Number,
+  },
+  mapsRatingsCount: {
+    type: Number,
+  },
+  coordinates: {
+    lat: Number,
+    lng: Number,
+  },
+  openHours: 
+    [
+      {
+        close: {
+          day: Number,
+          time: String,
+        },
+        open: {
+          day: Number,
+          time: String
+        }
+      }
+    ]
+  ,
+  website: {
+    type: String
+  },
   name: { 
     type: String,
     required: true
@@ -29,6 +56,12 @@ const resSchema = new mongoose.Schema({ //mongoose schema
   comments:{
     type:String,
     required: true
+  },
+  visited:{
+    type:Boolean
+  },
+  favourite:{
+    type: Boolean
   },
   image:{
     // eslint-disable-next-line no-undef

@@ -27,6 +27,11 @@ app.get('/api/res', (request, response) => {
    
 })
 
+app.get('/api/maps-key', (req, res) => {
+  const apiKey = process.env.MAPS_KEY
+  res.send({apiKey})
+})
+
 app.get('/api/res/:id', (request, response) => {
   let id = request.params.id
   Res.findById(id)
@@ -38,7 +43,6 @@ app.get('/api/res/:id', (request, response) => {
 
         // Modify the object to include the base64-encoded string
         const modifiedDoc = { ...result, imageData}
-        console.log(modifiedDoc)
         // Return the modified object as a response
         response.json(modifiedDoc)
       }
@@ -46,6 +50,20 @@ app.get('/api/res/:id', (request, response) => {
         response.status(404).end()
       }
     })
+})
+
+app.put('/api/res/:id', (request, response, next) => {
+  const body = request.body
+  const res = {
+    visited: body.visited,
+    favourite: body.favourite
+  }
+
+  Res.findByIdAndUpdate(request.params.id, res, { new: true })
+    .then(updated => {
+      response.json(updated.toJSON())
+    })
+    .catch(error => next(error))
 })
 
 app.delete('/api/res/:id', (request, response) => {
@@ -67,15 +85,32 @@ const upload = multer({storage: Storage})
 app.post('/api/res', upload.single('image'), (req, res) => { //first uploaded to folder in server, then adds the image to mongo
   
   const body = req.body //this gets the object
+  let img = {}
+  if(req.file){
+    img = {
+      data: fs.readFileSync('./public/images/' + req.file.filename),
+      contentType:'image/png'
+    }
+  }
+  else{
+    img = {
+      data: fs.readFileSync('./public/images/1672024401088.png'),
+      contentType:'image/png'
+    }
+  }
   const newRes = new Res({
+    mapsRating: body.mapsRating,
+    mapsRatingsCount: body.mapsRatingsCount,
+    coordinates: body.coordinates,
+    openHours: body.openHours,
+    website: body.website,
     name: body.name,
     rating: body.rating,
     timesVisited: body.timesVisited,
     comments: body.comments,
-    image:{
-      data: fs.readFileSync('./public/images/' + req.file.filename),
-      contentType:'image/png'
-    }
+    visited: body.visited,
+    favourite: body.favourite,
+    image: img
   })
   newRes.save().then(result => {
     res.json(result)
