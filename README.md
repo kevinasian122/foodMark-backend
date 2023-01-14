@@ -1,6 +1,7 @@
 # FoodMark
 
 https://foodmark.fly.dev/  
+
 Responsive full-stack web app for organizing user restaurant experiences  
 Created with React.js frontend, node.js and express.js backend, connected to MongoDB database using Mongoose library  
 I created FoodMark because I really love trying restaurants and wanted something to organize my experiences. Another big reason is to get myself familiar with the technologies used. 
