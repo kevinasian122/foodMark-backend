@@ -67,7 +67,11 @@ const resSchema = new mongoose.Schema({ //mongoose schema
     // eslint-disable-next-line no-undef
     data: Buffer,
     contentType: String
-  }
+  },
+  /*user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }*/
 })
 
 

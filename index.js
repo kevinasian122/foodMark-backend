@@ -14,16 +14,20 @@ app.use(express.static('build'))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
+const usersRouter = require('./controllers/users')
+app.use('/api/users', usersRouter)
+//const User = require('./models/user')
+
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
 
-app.get('/api/res', (request, response) => {
-  Res.find({})
-    .then(result => {
-      response.json(result)
-    })
+app.get('/api/res', async (request, response) => {
+  const res = await Res.find({})//.populate('user', { username: 1, name: 1 })
+  
+  response.json(res)
+  
    
 })
 
@@ -82,9 +86,11 @@ const Storage = multer.diskStorage({
 })
 const upload = multer({storage: Storage})
 
-app.post('/api/res', upload.single('image'), (req, res) => { //first uploaded to folder in server, then adds the image to mongo
+app.post('/api/res', upload.single('image'), async (req, res) => { //first uploaded to folder in server, then adds the image to mongo
   
   const body = req.body //this gets the object
+  //const user = await User.findById(body.userId)
+
   let img = {}
   if(req.file){
     img = {
@@ -110,11 +116,14 @@ app.post('/api/res', upload.single('image'), (req, res) => { //first uploaded to
     comments: body.comments,
     visited: body.visited,
     favourite: body.favourite,
-    image: img
+    image: img,
   })
-  newRes.save().then(result => {
-    res.json(result)
-  })
+  const saved = await newRes.save()
+  //user.restaurants = user.restaurants.concat(saved._id)
+  //await user.save()
+  
+  res.json(saved)
+
     
   
   
